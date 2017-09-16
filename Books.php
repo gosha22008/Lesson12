@@ -46,47 +46,49 @@
         <th>Жанр</th>
         <th>ISBN</th>
     </tr>
-<?php
-$host = 'localhost';    //127.0.0.1
-$db = 'Books';
-$user = 'root';
-$password = null;
+    <?php
+    $host = 'localhost';    //127.0.0.1
+    $db = 'Books';
+    $user = 'root';
+    $password = null;
+    $charset = 'utf8';
 
-$mysqli = new mysqli($host, $user, $password, $db);
-if ($mysqli) {
-    //echo "Подключение успешно!<br>";
-} else {
-    echo "Ошибка! Соединения нет!";
-    echo $mysqli->connect_error();
-    exit();
+//    $mysqli = new mysqli($host, $user, $password, $db);
+//    if ($mysqli) {
+//        //echo "Подключение успешно!<br>";
+//    } else {
+//        echo "Ошибка! Соединения нет!";
+//        echo $mysqli->connect_error();
+//        exit();
+//    }
+//    $charset = 'utf8';
+//    $mysqli->set_charset($charset);
+
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=$charset", $user, $password);
+    //var_dump($pdo);exit();
+
+    function showBooks($statement){
+    while ($row = $statement->fetch(PDO::FETCH_ASSOC)) { ?>
+    <tr>
+        <td> <?= $row['name'] ?></td>
+        <td> <?= $row['author'] ?></td>
+        <td> <?= $row['year'] ?></td>
+        <td> <?= $row['genre'] ?></td>
+        <td> <?= $row['isbn'] ?></td>
+    </tr>
+<?php }
 }
 if (isset($_GET['isbn']) or isset($_GET['author']) or isset($_GET['name'])) {
-    foreach ($_GET as $k => $v ) {
+    foreach ($_GET as $k => $v) {
         $sql = "SELECT * FROM `books` WHERE `$k` LIKE '%" . $v . "%' ";
-        $result = $mysqli->query($sql);
-        while ($row = $result->fetch_assoc()) {
-            //$results[] = $row;
-            echo '<tr>';
-            echo '<td>' . $row['name'] . '</td>';
-            echo '<td>' . $row['author'] . '</td>';
-            echo '<td>' . $row['year'] . '</td>';
-            echo '<td>' . $row['genre'] . '</td>';
-            echo '<td>' . $row['isbn'] . '</td>';
-            echo '</tr>';
-        }
+        $statement = $pdo -> prepare($sql);
+        $statement -> execute();
+        showBooks($statement);
     }
 } else {
     $sql = "SELECT * FROM `books` ";
-    $result = $mysqli->query($sql);
-    while ($row = $result->fetch_assoc()) {
-        //$results[] = $row;
-        echo '<tr>';
-        echo '<td>' . $row['name'] . '</td>';
-        echo '<td>' . $row['author'] . '</td>';
-        echo '<td>' . $row['year'] . '</td>';
-        echo '<td>' . $row['genre'] . '</td>';
-        echo '<td>' . $row['isbn'] . '</td>';
-        echo '</tr>';
-    }
+    $statement = $pdo -> prepare($sql);
+    $statement -> execute();
+    showBooks($statement);
 }
 ?>
