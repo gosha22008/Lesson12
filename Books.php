@@ -5,19 +5,16 @@
             border-spacing: 0;
             border-collapse: collapse;
         }
-
         table td, table th {
             border: 1px solid #ccc;
             padding: 5px;
         }
-
         table th {
             background: #eee;
         }
     </style>
 </head>
 <body><h1>Библиотека успешного человека</h1>
-
 <!--<form method="GET">
     <input name="isbn" placeholder="ISBN" value="" type="text">
     <input name="name" placeholder="Название книги" value="" type="text">
@@ -53,19 +50,7 @@
     $password = null;
     $charset = 'utf8';
 
-//    $mysqli = new mysqli($host, $user, $password, $db);
-//    if ($mysqli) {
-//        //echo "Подключение успешно!<br>";
-//    } else {
-//        echo "Ошибка! Соединения нет!";
-//        echo $mysqli->connect_error();
-//        exit();
-//    }
-//    $charset = 'utf8';
-//    $mysqli->set_charset($charset);
-
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=$charset", $user, $password);
-    //var_dump($pdo);exit();
 
     function showBooks($statement){
     while ($row = $statement->fetch(PDO::FETCH_ASSOC)) { ?>
@@ -79,8 +64,12 @@
 <?php }
 }
 if (isset($_GET['isbn']) or isset($_GET['author']) or isset($_GET['name'])) {
+        var_dump($_GET);
+
     foreach ($_GET as $k => $v) {
-        $sql = "SELECT * FROM `books` WHERE `$k` LIKE '%" . $v . "%' ";
+        $k = quotemeta($k);
+        $v = quotemeta($v);
+        $sql = "SELECT * FROM `books` WHERE `$k` LIKE '%" .$v. "%' ";
         $statement = $pdo -> prepare($sql);
         $statement -> execute();
         showBooks($statement);
